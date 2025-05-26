@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Animal Log - FaunaWatch</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      background-image: url('{{ url_for('static', filename='images/background.jpg') }}');
+      background-repeat: repeat;
+      background-size: auto;
+      background-color: #f5f2eb;
+    }
+
+    .dashboard-header {
+      background-color: rgba(255, 255, 255, 0.85);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .btn-dashboard {
+      background-color: #769cd6 !important;
+      color: white;
+      border: none;
+    }
+
+    .btn-dashboard:hover {
+      background-color: #5b83c5 !important;
+    }
+
+    .filter-bar {
+      background-color: #d6cbbc !important;
+    }
+
+    .table-custom thead th {
+      background-color: #635b4c !important;
+      color: white !important;
+      white-space: nowrap;
+    }
+
+    .table-custom tbody tr {
+      background-color: #769cd6 !important;
+      color: white;
+    }
+
+    .table-custom tbody tr:hover {
+      background-color: #5b83c5 !important;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .table th,
+    .table td {
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+
+    .detection-info {
+      text-align: center;
+    }
+
+    .detection-img {
+      max-height: 80px;
+      margin: 0.5rem 0;
+      border-radius: 8px;
+    }
+
+    .download-btn {
+      border: 2px solid #769cd6;
+      color: #769cd6;
+      background-color: white;
+      font-weight: bold;
+      margin-top: 0.5rem;
+    }
+
+    .download-btn:hover {
+      background-color: #769cd6;
+      color: white;
+    }
+
+    @media (max-width: 768px) {
+      .table th,
+      .table td {
+        font-size: 0.85rem;
+        white-space: normal;
+      }
+
+      .detection-img {
+        max-height: 60px;
+      }
+
+      .btn-dashboard {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container py-4">
+    <!-- Header -->
+    <div class="dashboard-header text-center">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="FaunaWatch Logo" style="max-height: 60px;">
+      <h2 class="mt-2">Animal Detection Log</h2>
+      <a href="{{ url_for('dashboard') }}" class="btn btn-dashboard mt-2">Back to Dashboard</a>
+    </div>
+
+    <!-- Filters -->
+    <form method="get" class="row gy-2 gx-3 align-items-center mb-4 filter-bar rounded p-3 shadow">
+      <div class="col-12 col-md-auto">
+        <label for="animalFilter" class="form-label mb-0">Filter by Animal:</label>
+        <select name="animal" id="animalFilter" class="form-select">
+          <option {% if current_filter == 'All' %}selected{% endif %}>All</option>
+          <option {% if current_filter == 'Mongoose' %}selected{% endif %}>Mongoose</option>
+          <option {% if current_filter == 'Cape Genet' %}selected{% endif %}>Cape Genet</option>
+          <option {% if current_filter == 'Honey Badger' %}selected{% endif %}>Honey Badger</option>
+          <option {% if current_filter == 'Caracal' %}selected{% endif %}>Caracal</option>
+          <option {% if current_filter == 'Leopard' %}selected{% endif %}>Leopard</option>
+        </select>
+      </div>
+
+      <div class="col-12 col-md-auto">
+        <label for="sortOrder" class="form-label mb-0">Sort by Time:</label>
+        <select name="sort" id="sortOrder" class="form-select">
+          <option value="desc" {% if current_sort == 'desc' %}selected{% endif %}>Newest First</option>
+          <option value="asc" {% if current_sort == 'asc' %}selected{% endif %}>Oldest First</option>
+        </select>
+      </div>
+
+      <div class="col-12 col-md-auto">
+        <label class="d-block invisible">Submit</label>
+        <button type="submit" class="btn btn-dashboard w-100">Apply</button>
+      </div>
+    </form>
+
+    <!-- Table -->
+    <div class="card shadow p-4">
+      <div class="table-responsive">
+        <table class="table table-bordered table-custom align-middle text-center">
+          <thead>
+            <tr>
+              <th scope="col">Timestamp</th>
+              <th scope="col">Detection Info</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for detection in detections %}
+            <tr>
+              <td>{{ detection.timestamp }}</td>
+              <td class="detection-info">
+                <strong>{{ detection.animal }}</strong><br>
+                <img src="{{ url_for('static', filename='data/images/' + detection.image) }}"
+                     alt="Detection Image"
+                     class="img-thumbnail detection-img">
+                <div><strong>{{ detection.confidence }}</strong> model confidence</div>
+                <a href="{{ url_for('static', filename='data/videos/' + detection.video) }}"
+                   download class="btn btn-sm download-btn">
+                  <i class="fas fa-download me-1"></i>Download Video
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
