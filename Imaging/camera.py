@@ -4,7 +4,7 @@ from time import sleep
 
 import json
 from gpiozero import Button, DigitalOutputDevice
-from picamzero import PiCam
+from picamzero import Camera
 
 # Initialize GPIO for trigger and IR LED driver MOSFETs
 trigger = Button(15)
@@ -16,7 +16,7 @@ home_dir = os.environ['HOME']
 detect_dir = f"{home_dir}/Desktop/detections"
 
 # Initialize the PiCam
-camera = PiCam()
+camera = Camera()
 
 def capture(rec_time):
     timestamp = datetime.now()
@@ -30,7 +30,7 @@ def capture(rec_time):
     led2.on()
 
     # Take image
-    camera.capture(f"{filename}.jpg")
+    camera.take_photo(f"{filename}.jpg")
     print(f"Image saved: {filename}.jpg")
 
     # Take video
@@ -73,9 +73,10 @@ def detect(timestamp,filename):
 
 # Wait for button press indefinitely
 dead_time = 15
-rec_time = deadtime
+rec_time = dead_time
 timestamp = datetime.now() - timedelta(seconds=dead_time)
 while True:
+    print("Waiting for trigger...")
     trigger.wait_for_press()
     if datetime.now() > timestamp + timedelta(seconds=dead_time):
         timestamp,filename = capture(rec_time)
